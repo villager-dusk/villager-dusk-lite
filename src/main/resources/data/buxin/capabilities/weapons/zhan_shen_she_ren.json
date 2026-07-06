@@ -1,0 +1,12 @@
+{
+    "type": "legendaryswordtwohand",
+    "attributes": {
+        "common": {
+            "armor_negation": 2.1,
+                "impact": 2.0,
+            "max_strikes": 4,
+            "speed_bonus": -0.41,
+            "damage_bonus": 0.0
+        }
+    }
+ }

@@ -1,0 +1,41 @@
+modLoader="javafml"
+loaderVersion="[47,)"
+license="Custom License"
+
+[[mods]]
+logoFile = "logo.png"
+modId="buxin"
+version="3.3.8"
+displayName="Villager Dusk Lite"
+credits="wyz"
+displayURL = "https://villager-dusk.github.io"
+authors="wyz"
+
+[[dependencies.buxin]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.20.1]"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.buxin]]
+    modId="geckolib"
+    mandatory=false
+    versionRange="[0,)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.buxin]]
+    modId="epicfight"
+    mandatory=false
+    versionRange="[19,)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.buxin]]
+    modId="indestructible"
+    mandatory=false
+    versionRange="[19,)"
+    ordering="NONE"
+    side="BOTH"
+

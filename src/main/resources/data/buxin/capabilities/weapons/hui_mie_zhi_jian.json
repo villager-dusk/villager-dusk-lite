@@ -1,0 +1,12 @@
+{
+    "type": "entity_303_sword",
+    "attributes": {
+        "common": {
+            "armor_negation": 0.01,
+                "impact": 0.07,
+            "max_strikes": 4,
+            "speed_bonus": 0.614,
+            "damage_bonus": 0.0
+        }
+    }
+ }

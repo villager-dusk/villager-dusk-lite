@@ -1,0 +1,12 @@
+{
+    "type": "legendary_sword",
+    "attributes": {
+        "common": {
+            "armor_negation": 2.1,
+                "impact": 3.8,
+            "max_strikes": 4,
+            "speed_bonus": -0.58,
+            "damage_bonus": 0.0
+        }
+    }
+ }

@@ -1,0 +1,11 @@
+{
+    "trail": {
+    	"color": [108, 183, 226],
+    	"begin_pos": [0.0, 0.0, -0.1],
+        "end_pos": [0.0, 0.0, -3.79],
+        "lifetime": 6.01,
+        "interpolations": 125,
+        "texture_path": "epicfight:textures/particle/ice_and_fire_sword_trail.png",
+        "particle_type": "epicfight:swing_trail"
+    }
+}

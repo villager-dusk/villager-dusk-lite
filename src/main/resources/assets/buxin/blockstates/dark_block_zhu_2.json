@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "buxin:block/dark_block_zhu_2"
+    },
+    "facing=east": {
+      "model": "buxin:block/dark_block_zhu_2",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "buxin:block/dark_block_zhu_2",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "buxin:block/dark_block_zhu_2",
+      "y": 270
+    }
+  }
+}

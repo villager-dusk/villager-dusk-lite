@@ -1,0 +1,34 @@
+{
+  "required": true,
+  "minVersion": "0.8.5",
+  "package": "net.mcreator.buxin.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+    "ArrowMixin",
+    "CowMixin",
+    "ExplosionMixin",
+    "GuardSkillMixin",
+    "ItemEntityMixin",
+    "MonsterMixin",
+    "NearestAttackableTargetGoalMixin",
+    "ParryingMixin",
+    "ParryMixin",
+    "PlayerMixin",
+    "PolarBearMixin",
+    "SkeletonMixin",
+    "ThrownEnderperalMixin",
+    "ZombieMixin"
+  ],
+  "client": [
+    "EntityRendererMixin",
+    "FlameMixin",
+    "MixinColorBoltEntity",
+    "PHumanoidRendererMixin",
+    "PortalParticleMixin",
+    "TrailParticleMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "refmap": "buxinmod.mixins.refmap.json"
+  }

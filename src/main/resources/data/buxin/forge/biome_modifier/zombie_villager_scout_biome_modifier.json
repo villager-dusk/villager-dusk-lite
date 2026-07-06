@@ -1,0 +1,12 @@
+{
+  "type": "forge:add_spawns",
+  "biomes": {
+    "type": "forge:any"
+  },
+  "spawners": {
+    "type": "buxin:zombie_villager_scout",
+    "weight": 4,
+    "minCount": 1,
+    "maxCount": 3
+  }
+}

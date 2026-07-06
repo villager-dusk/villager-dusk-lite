@@ -1,0 +1,12 @@
+{
+    "type": "snakeblade",
+    "attributes": {
+        "common": {
+            "armor_negation": 0.01,
+                "impact": 2.91,
+            "max_strikes": 4,
+            "speed_bonus": -0.46,
+            "damage_bonus": 0.0
+        }
+    }
+ }

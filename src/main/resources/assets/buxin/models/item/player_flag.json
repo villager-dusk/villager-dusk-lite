@@ -1,0 +1,8 @@
+{
+  "parent": "buxin:custom/player_flag",
+  "textures": {
+    "0": "buxin:items/player_flag",
+    "1": "buxin:items/player_flag",
+    "particle": "buxin:items/player_flag"
+  }
+}

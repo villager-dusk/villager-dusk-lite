@@ -1,0 +1,104 @@
+
+package net.mcreator.buxin.item;
+
+import net.mcreator.buxin.init.BuxinModTabs;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.ArmorMaterial;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraftforge.registries.ForgeRegistries;
+
+public abstract class RedVillagerArmorItem extends ArmorItem {
+	public RedVillagerArmorItem(EquipmentSlot slot, Item.Properties properties) {
+		super(new ArmorMaterial() {
+
+
+			@Override
+			public int getDurabilityForType(Type type) {
+				return new int[]{13, 15, 16, 11}[slot.getIndex()] * 25;
+			}
+
+			@Override
+			public int getDefenseForType(Type type) {
+				return new int[]{1, 1, 1, 1}[slot.getIndex()];
+			}
+
+			@Override
+			public int getEnchantmentValue() {
+				return 9;
+			}
+
+			@Override
+			public SoundEvent getEquipSound() {
+				return ForgeRegistries.SOUND_EVENTS.getValue(new ResourceLocation("item.armor.equip_generic"));
+			}
+
+			@Override
+			public Ingredient getRepairIngredient() {
+				return Ingredient.of();
+			}
+
+			@Override
+			public String getName() {
+				return "red_villager_armor";
+			}
+
+			@Override
+			public float getToughness() {
+				return 1.3f;
+			}
+
+			@Override
+			public float getKnockbackResistance() {
+				return 4f;
+			}
+		},getTypeFromSlot( slot), properties);
+	}
+
+
+	private static ArmorItem.Type getTypeFromSlot(EquipmentSlot slot) {
+		return switch (slot) {
+			case HEAD -> ArmorItem.Type.HELMET;
+			case CHEST -> ArmorItem.Type.CHESTPLATE;
+			case LEGS -> ArmorItem.Type.LEGGINGS;
+			case FEET -> ArmorItem.Type.BOOTS;
+			default -> throw new IllegalArgumentException("Invalid slot: " + slot);
+		};
+	}
+
+	public static class Chestplate extends RedVillagerArmorItem {
+		public Chestplate() {
+			super(EquipmentSlot.CHEST, new Item.Properties());
+		}
+
+		@Override
+		public String getArmorTexture(ItemStack stack, Entity entity, EquipmentSlot slot, String type) {
+			return "buxin:textures/models/armor/xie_zi____layer_1.png";
+		}
+	}
+
+	public static class Leggings extends RedVillagerArmorItem {
+		public Leggings() {
+			super(EquipmentSlot.LEGS, new Item.Properties());
+		}
+		@Override
+		public String getArmorTexture(ItemStack stack, Entity entity, EquipmentSlot slot, String type) {
+			return "buxin:textures/models/armor/xie_zi____layer_2.png";
+		}
+	}
+
+	public static class Boots extends RedVillagerArmorItem {
+		public Boots() {
+			super(EquipmentSlot.FEET, new Item.Properties());
+		}
+		@Override
+		public String getArmorTexture(ItemStack stack, Entity entity, EquipmentSlot slot, String type) {
+			return "buxin:textures/models/armor/xie_zi____layer_1.png";
+		}
+	}
+}

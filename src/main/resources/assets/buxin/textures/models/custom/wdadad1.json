@@ -1,0 +1,7 @@
+{
+  "parent": "annoying_villagersbychentu:custom/zhan_shen_zhi_ren_cheng_pin_",
+  "textures": {
+    "0": "annoying_villagersbychentu:blocks/han_hen_hi_en",
+    "particle": "annoying_villagersbychentu:items/han_hen_hi_en"
+  }
+}

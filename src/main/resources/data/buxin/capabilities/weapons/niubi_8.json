@@ -1,0 +1,12 @@
+{
+    "type": "hb_sickle",
+    "attributes": {
+        "two_hand": {
+            "armor_negation": 10,
+                "impact": 3.5,
+            "max_strikes": 3,
+            "speed_bonus": 0.15,
+            "damage_bonus": 0.0
+        }
+    }
+ }

@@ -1,0 +1,8 @@
+{
+  "parent": "buxin:custom/villager_flag",
+  "textures": {
+    "0": "buxin:items/villager_flag",
+    "1": "buxin:items/villager_flag",
+    "particle": "buxin:items/villager_flag"
+  }
+}

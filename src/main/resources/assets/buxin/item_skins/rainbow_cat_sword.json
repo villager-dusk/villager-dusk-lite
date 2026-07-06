@@ -1,0 +1,11 @@
+{
+    "trail": {
+    	"color": [255, 0, 255],
+    	"begin_pos": [0.0, 0.0, -0.17],
+    	"end_pos": [0.0, 0.0, -1.56],
+    	"lifetime": 6.01,
+		"interpolations": 125,
+        "texture_path": "epicfight:textures/particle/rainbow.png",
+        "particle_type": "light_trail_mod:rainbow_light_trail"
+    }
+}

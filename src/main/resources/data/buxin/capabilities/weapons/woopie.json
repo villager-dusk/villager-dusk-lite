@@ -1,0 +1,12 @@
+{
+    "type": "woopie",
+    "attributes": {
+        "common": {
+            "armor_negation": 0.01,
+                "impact": 1.7,
+            "max_strikes": 4,
+            "speed_bonus": 0.3,
+            "damage_bonus": 0.0
+        }
+    }
+ }
