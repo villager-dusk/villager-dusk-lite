@@ -1,4 +1,3 @@
-
 package net.mcreator.buxin.entity.e_null;
 
 import net.mcreator.buxin.BuxinMod;
@@ -12,7 +11,6 @@ import net.mcreator.buxin.procedures.NullDangShiTiShouShangShiProcedure;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.resources.ResourceLocation;
@@ -45,430 +43,275 @@ import java.util.EnumSet;
 import java.util.UUID;
 
 public class NullEntity extends Monster {
+
     private NullSwordEntity nullSwordEntity;
     private UUID nullSwordUUID;
-
     private NullAxeEntity nullAxeEntity;
     private UUID nullAxeUUID;
-
     private NullPickaxeEntity nullPickaxeEntity;
     private UUID nullPickaxeUUID;
-
     private NullShovelEntity nullShovelEntity;
     private UUID nullShovelUUID;
-
     private NullHoeEntity nullHoeEntity;
     private UUID nullHoeUUID;
+    private boolean initialSpawn;
 
-    private boolean initialSpawn = false;
-
-    public NullSwordEntity getNullSwordEntity() {
-        return nullSwordEntity;
-    }
-
-    public NullAxeEntity getNullAxeEntity() {
-        return nullAxeEntity;
-    }
-
-    public NullPickaxeEntity getNullPickaxeEntity() {
-        return nullPickaxeEntity;
-    }
-
-    public NullShovelEntity getNullShovelEntity() {
-        return nullShovelEntity;
-    }
-
-    public NullHoeEntity getNullHoeEntity() {
-        return nullHoeEntity;
-    }
-
-    public NullEntity(EntityType<NullEntity> entitytype, Level level) {
-        super(entitytype, level);
+    public NullEntity(EntityType<NullEntity> type, Level level) {
+        super(type, level);
         maxUpStep = 3.0f;
-        this.xpReward = 80;
-        this.setNoAi(false);
-        this.setPersistenceRequired();
-        this.moveControl = new FlyingMoveControl(this, 10, true);
-        this.setCustomName(Component.literal("Null"));
+        xpReward = 80;
+        setPersistenceRequired();
+        moveControl = new FlyingMoveControl(this, 10, true);
+        setCustomName(Component.literal("Null"));
     }
 
+    // ==================== 网络 ====================
     @Override
     public Packet<ClientGamePacketListener> getAddEntityPacket() {
         return NetworkHooks.getEntitySpawningPacket(this);
     }
 
+    @Override
     protected PathNavigation createNavigation(Level level) {
         return new FlyingPathNavigation(this, level);
     }
 
+    // ==================== 持久化 ====================
     @Override
     public void addAdditionalSaveData(CompoundTag tag) {
         super.addAdditionalSaveData(tag);
-        if (nullSwordUUID != null) {
-            tag.putUUID("NullSwordUUID", nullSwordUUID);
-        }
-        if (nullAxeUUID != null) {
-            tag.putUUID("NullAxeUUID", nullAxeUUID);
-        }
-        if (nullPickaxeUUID != null) {
-            tag.putUUID("NullPickaxeUUID", nullPickaxeUUID);
-        }
-        if (nullShovelUUID != null) {
-            tag.putUUID("NullShovelUUID", nullShovelUUID);
-        }
-        if (nullHoeUUID != null) {
-            tag.putUUID("NullHoeUUID", nullHoeUUID);
-        }
+        putUUID(tag, "NullSwordUUID", nullSwordUUID);
+        putUUID(tag, "NullAxeUUID", nullAxeUUID);
+        putUUID(tag, "NullPickaxeUUID", nullPickaxeUUID);
+        putUUID(tag, "NullShovelUUID", nullShovelUUID);
+        putUUID(tag, "NullHoeUUID", nullHoeUUID);
         tag.putBoolean("InitialSpawn", initialSpawn);
     }
 
     @Override
     public void readAdditionalSaveData(CompoundTag tag) {
         super.readAdditionalSaveData(tag);
-        if (tag.hasUUID("NullSwordUUID")) {
-            nullSwordUUID = tag.getUUID("NullSwordUUID");
-        }
-        if (tag.hasUUID("NullAxeUUID")) {
-            nullAxeUUID = tag.getUUID("NullAxeUUID");
-        }
-        if (tag.hasUUID("NullPickaxeUUID")) {
-            nullPickaxeUUID = tag.getUUID("NullPickaxeUUID");
-        }
-        if (tag.hasUUID("NullShovelUUID")) {
-            nullShovelUUID = tag.getUUID("NullShovelUUID");
-        }
-        if (tag.hasUUID("NullHoeUUID")) {
-            nullHoeUUID = tag.getUUID("NullHoeUUID");
-        }
-        initialSpawn = tag.getBoolean("InitialSpawn");
+        nullSwordUUID   = getUUID(tag, "NullSwordUUID");
+        nullAxeUUID     = getUUID(tag, "NullAxeUUID");
+        nullPickaxeUUID = getUUID(tag, "NullPickaxeUUID");
+        nullShovelUUID  = getUUID(tag, "NullShovelUUID");
+        nullHoeUUID     = getUUID(tag, "NullHoeUUID");
+        initialSpawn    = tag.getBoolean("InitialSpawn");
     }
 
+    private static void putUUID(CompoundTag tag, String key, UUID uuid) {
+        if (uuid != null) tag.putUUID(key, uuid);
+    }
+
+    private static UUID getUUID(CompoundTag tag, String key) {
+        return tag.hasUUID(key) ? tag.getUUID(key) : null;
+    }
+
+    // ==================== 初始化武器 ====================
     private void initialSpawn() {
-        if (this.level() instanceof ServerLevel serverLevel) {
-            NullSwordEntity nullSwordEntity = new NullSwordEntity(BuxinModEntities.NULL_SWORD.get(), serverLevel);
-            nullSwordEntity.moveTo(this.getX() + Mth.nextDouble(serverLevel.getRandom(), 1.0D, 10.0D),
-                    this.getY() + Mth.nextDouble(serverLevel.getRandom(), 1.0D, 10.0D),
-                    this.getZ() + Mth.nextDouble(serverLevel.getRandom(), 1.0D, 10.0D),
-                    serverLevel.getRandom().nextFloat() * 360.0F, 0.0F);
-            nullSwordEntity.finalizeSpawn(serverLevel, serverLevel.getCurrentDifficultyAt(this.blockPosition()), MobSpawnType.MOB_SUMMONED, null,null);
-            serverLevel.addFreshEntity(nullSwordEntity);
-            this.nullSwordUUID = nullSwordEntity.getUUID();
-            this.nullSwordEntity = nullSwordEntity;
-            nullSwordEntity.setNullEntity(this);
-            nullSwordEntity.setNullUUID(this.getUUID());
+        if (!(level() instanceof ServerLevel serverLevel)) return;
+        initialSpawn = true;
 
-            NullAxeEntity nullAxeEntity = new NullAxeEntity(BuxinModEntities.NULL_AXE.get(), serverLevel);
-            nullAxeEntity.moveTo(this.getX() + Mth.nextDouble(serverLevel.getRandom(), 1.0D, 10.0D),
-                    this.getY() + Mth.nextDouble(serverLevel.getRandom(), 1.0D, 10.0D),
-                    this.getZ() + Mth.nextDouble(serverLevel.getRandom(), 1.0D, 10.0D),
-                    serverLevel.getRandom().nextFloat() * 360.0F, 0.0F);
-            nullAxeEntity.finalizeSpawn(serverLevel, serverLevel.getCurrentDifficultyAt(this.blockPosition()), MobSpawnType.MOB_SUMMONED, null,null);
-            serverLevel.addFreshEntity(nullAxeEntity);
-            this.nullAxeUUID = nullAxeEntity.getUUID();
-            this.nullAxeEntity = nullAxeEntity;
-            nullAxeEntity.setNullEntity(this);
-            nullAxeEntity.setNullUUID(this.getUUID());
+        nullSwordEntity   = spawnTool(serverLevel, BuxinModEntities.NULL_SWORD.get(), NullSwordEntity.class);
+        nullAxeEntity     = spawnTool(serverLevel, BuxinModEntities.NULL_AXE.get(), NullAxeEntity.class);
+        nullPickaxeEntity = spawnTool(serverLevel, BuxinModEntities.NULL_PICKAXE.get(), NullPickaxeEntity.class);
+        nullShovelEntity  = spawnTool(serverLevel, BuxinModEntities.NULL_SHOVEL.get(), NullShovelEntity.class);
+        nullHoeEntity     = spawnTool(serverLevel, BuxinModEntities.NULL_HOE.get(), NullHoeEntity.class);
 
-            NullPickaxeEntity nullPickaxeEntity = new NullPickaxeEntity(BuxinModEntities.NULL_PICKAXE.get(), serverLevel);
-            nullPickaxeEntity.moveTo(this.getX() + Mth.nextDouble(serverLevel.getRandom(), 1.0D, 10.0D),
-                    this.getY() + Mth.nextDouble(serverLevel.getRandom(), 1.0D, 10.0D),
-                    this.getZ() + Mth.nextDouble(serverLevel.getRandom(), 1.0D, 10.0D),
-                    serverLevel.getRandom().nextFloat() * 360.0F, 0.0F);
-            nullPickaxeEntity.finalizeSpawn(serverLevel, serverLevel.getCurrentDifficultyAt(this.blockPosition()), MobSpawnType.MOB_SUMMONED, null, null);
-            serverLevel.addFreshEntity(nullPickaxeEntity);
-            this.nullPickaxeUUID = nullPickaxeEntity.getUUID();
-            this.nullPickaxeEntity = nullPickaxeEntity;
-            nullPickaxeEntity.setNullEntity(this);
-            nullPickaxeEntity.setNullUUID(this.getUUID());
-
-            NullShovelEntity nullShovelEntity = new NullShovelEntity(BuxinModEntities.NULL_SHOVEL.get(), serverLevel);
-            nullShovelEntity.moveTo(this.getX() + Mth.nextDouble(serverLevel.getRandom(), 1.0D, 10.0D),
-                    this.getY() + Mth.nextDouble(serverLevel.getRandom(), 1.0D, 10.0D),
-                    this.getZ() + Mth.nextDouble(serverLevel.getRandom(), 1.0D, 10.0D),
-                    serverLevel.getRandom().nextFloat() * 360.0F, 0.0F);
-            nullShovelEntity.finalizeSpawn(serverLevel, serverLevel.getCurrentDifficultyAt(this.blockPosition()), MobSpawnType.MOB_SUMMONED, null, null);
-            serverLevel.addFreshEntity(nullShovelEntity);
-            this.nullShovelUUID = nullShovelEntity.getUUID();
-            this.nullShovelEntity = nullShovelEntity;
-            nullShovelEntity.setNullEntity(this);
-            nullShovelEntity.setNullUUID(this.getUUID());
-
-            NullHoeEntity nullHoeEntity = new NullHoeEntity(BuxinModEntities.NULL_HOE.get(), serverLevel);
-            nullHoeEntity.moveTo(this.getX() + Mth.nextDouble(serverLevel.getRandom(), 1.0D, 10.0D),
-                    this.getY() + Mth.nextDouble(serverLevel.getRandom(), 1.0D, 10.0D),
-                    this.getZ() + Mth.nextDouble(serverLevel.getRandom(), 1.0D, 10.0D),
-                    serverLevel.getRandom().nextFloat() * 360.0F, 0.0F);
-            nullHoeEntity.finalizeSpawn(serverLevel, serverLevel.getCurrentDifficultyAt(this.blockPosition()), MobSpawnType.MOB_SUMMONED, null,null);
-            serverLevel.addFreshEntity(nullHoeEntity);
-            this.nullHoeUUID = nullHoeEntity.getUUID();
-            this.nullHoeEntity = nullHoeEntity;
-            nullHoeEntity.setNullEntity(this);
-            nullHoeEntity.setNullUUID(this.getUUID());
-        }
+        Method_114514.herobrine_born(this);
     }
 
+    private <T extends NullWeaponEntity> T spawnTool(ServerLevel level, EntityType<T> type, Class<T> clazz) {
+        T tool = type.create(level);
+        tool.moveTo(
+            getX() + Mth.nextDouble(random, 1, 10),
+            getY() + Mth.nextDouble(random, 1, 10),
+            getZ() + Mth.nextDouble(random, 1, 10),
+            random.nextFloat() * 360, 0
+        );
+        tool.finalizeSpawn(level, level.getCurrentDifficultyAt(blockPosition()), MobSpawnType.MOB_SUMMONED, null, null);
+        level.addFreshEntity(tool);
+        tool.setNullEntity(this);
+        tool.setNullUUID(getUUID());
+        return tool;
+    }
+
+    // ==================== tick ====================
     @Override
     public void tick() {
         super.tick();
+        if (level().isClientSide) return;
 
-        if (!this.level().isClientSide) {
-            if (!initialSpawn) {
-                this.initialSpawn = true;
-                initialSpawn();
-                Method_114514.herobrine_born(this);
-            }
-            if (nullSwordEntity == null && nullSwordUUID != null) {
-                Entity entity = ((ServerLevel) this.level()).getEntity(nullSwordUUID);
-                if (entity instanceof NullSwordEntity nullSword) {
-                    this.nullSwordEntity = nullSword;
-                } else {
-                    this.nullSwordUUID = null;
-                }
-            }
-            if (nullAxeEntity == null && nullAxeUUID != null) {
-                Entity entity = ((ServerLevel) this.level()).getEntity(nullAxeUUID);
-                if (entity instanceof NullAxeEntity nullAxe) {
-                    this.nullAxeEntity = nullAxe;
-                } else {
-                    this.nullAxeUUID = null;
-                }
-            }
-            if (nullPickaxeEntity == null && nullPickaxeUUID != null) {
-                Entity entity = ((ServerLevel) this.level()).getEntity(nullPickaxeUUID);
-                if (entity instanceof NullPickaxeEntity nullPickaxe) {
-                    this.nullPickaxeEntity = nullPickaxe;
-                } else {
-                    this.nullPickaxeUUID = null;
-                }
-            }
-            if (nullShovelEntity == null && nullShovelUUID != null) {
-                Entity entity = ((ServerLevel) this.level()).getEntity(nullShovelUUID);
-                if (entity instanceof NullShovelEntity nullShovel) {
-                    this.nullShovelEntity = nullShovel;
-                } else {
-                    this.nullShovelUUID = null;
-                }
-            }
-            if (nullHoeEntity == null && nullHoeUUID != null) {
-                Entity entity = ((ServerLevel) this.level()).getEntity(nullHoeUUID);
-                if (entity instanceof NullHoeEntity nullHoe) {
-                    this.nullHoeEntity = nullHoe;
-                } else {
-                    nullHoeUUID = null;
-                }
-            }
-        }
+        if (!initialSpawn) initialSpawn();
+
+        nullSwordEntity   = tryRestoreTool(nullSwordEntity, nullSwordUUID, NullSwordEntity.class);
+        nullAxeEntity     = tryRestoreTool(nullAxeEntity, nullAxeUUID, NullAxeEntity.class);
+        nullPickaxeEntity = tryRestoreTool(nullPickaxeEntity, nullPickaxeUUID, NullPickaxeEntity.class);
+        nullShovelEntity  = tryRestoreTool(nullShovelEntity, nullShovelUUID, NullShovelEntity.class);
+        nullHoeEntity     = tryRestoreTool(nullHoeEntity, nullHoeUUID, NullHoeEntity.class);
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T extends NullWeaponEntity> T tryRestoreTool(T field, UUID uuid, Class<T> clazz) {
+        if (field != null || uuid == null) return field;
+        Entity entity = ((ServerLevel) level()).getEntity(uuid);
+        return clazz.isInstance(entity) ? (T) entity : null;
     }
 
     @Override
-    protected void registerGoals() {
-        super.registerGoals();
-        this.goalSelector.addGoal(1, new MeleeAttackGoal(this, 1.2, false) {
-            @Override
-            protected double getAttackReachSqr(LivingEntity entity) {
-                return this.mob.getBbWidth() * this.mob.getBbWidth() + entity.getBbWidth();
-            }
-        });
-        this.goalSelector.addGoal(2, new RandomStrollGoal(this, 1));
-        this.targetSelector.addGoal(3, new HurtByTargetGoal(this));
-        this.goalSelector.addGoal(4, new RandomLookAroundGoal(this));
-        this.goalSelector.addGoal(5, new FloatGoal(this));
-        this.targetSelector.addGoal(6, new NearestAttackableTargetGoal<>(this, GreenVillagerCavalryEntity.class, true, false));
-        this.targetSelector.addGoal(7, new NearestAttackableTargetGoal<>(this, Grave2Entity.class, true, false));
-        this.targetSelector.addGoal(8, new NearestAttackableTargetGoal<>(this, Player.class, true, false));
-        this.targetSelector.addGoal(9, new NearestAttackableTargetGoal<>(this, PurpleVillagerCavalryEntity.class, true, false));
-        this.targetSelector.addGoal(10, new NearestAttackableTargetGoal<>(this, RedVillagerEntity.class, true, false));
-        this.targetSelector.addGoal(11, new NearestAttackableTargetGoal<>(this, CunMinWeiBingEntity.class, true, false));
-        this.targetSelector.addGoal(12, new NearestAttackableTargetGoal<>(this, Jshaman2Entity.class, true, false));
-        this.targetSelector.addGoal(13, new NearestAttackableTargetGoal<>(this, ShifangEntity.class, true, false));
-        this.targetSelector.addGoal(14, new NearestAttackableTargetGoal<>(this, LanemobentiEntity.class, true, false));
-        AddCommonAttackGoal.Herobrine(this);
-        this.goalSelector.addGoal(24, new Goal() {
-            {
-                this.setFlags(EnumSet.of(Flag.MOVE));
-            }
-
-            public boolean canUse() {
-                return NullEntity.this.getTarget() != null && !NullEntity.this.getMoveControl().hasWanted();
-            }
-
-            public boolean canContinueToUse() {
-                return NullEntity.this.getMoveControl().hasWanted() && NullEntity.this.getTarget() != null && NullEntity.this.getTarget().isAlive();
-            }
-
-            public void start() {
-                LivingEntity livingentity = NullEntity.this.getTarget();
-                Vec3 vec3 = livingentity.getEyePosition(1.0F);
-
-                NullEntity.this.moveControl.setWantedPosition(vec3.x, vec3.y, vec3.z, 1.0D);
-            }
-
-            public void tick() {
-                LivingEntity livingentity = NullEntity.this.getTarget();
-
-                if (NullEntity.this.getBoundingBox().intersects(livingentity.getBoundingBox())) {
-                    NullEntity.this.doHurtTarget(livingentity);
-                } else {
-                    double d0 = NullEntity.this.distanceToSqr(livingentity);
-
-                    if (d0 < 16.0D) {
-                        Vec3 vec3 = livingentity.getEyePosition(1.0F);
-
-                        NullEntity.this.moveControl.setWantedPosition(vec3.x, vec3.y, vec3.z, 5.0D);
-                    }
-                }
-            }
-        });
-    }
-
-    public MobType getMobType() {
-        return MobType.UNDEAD;
-    }
-
-    public boolean removeWhenFarAway(double d0) {
-        return false;
-    }
-
-    public double getMyRidingOffset() {
-        return -0.35D;
-    }
-
-    public SoundEvent getHurtSound(DamageSource damagesource) {
-        return ForgeRegistries.SOUND_EVENTS.getValue(new ResourceLocation("entity.generic.hurt"));
-    }
-
-    public SoundEvent getDeathSound() {
-        return ForgeRegistries.SOUND_EVENTS.getValue(new ResourceLocation("entity.generic.death"));
-    }
-
-    public boolean causeFallDamage(float f, float f1, DamageSource damagesource) {
-        return false;
-    }
-
-    public boolean hurt(DamageSource damagesource, float f) {
-        NullDangShiTiShouShangShiProcedure.execute(this.level(), this.getX(), this.getY(), this.getZ(), this, damagesource.getEntity());
-
-        if (damagesource.is(DamageTypes.CACTUS)) return false;
-        if (damagesource.is(DamageTypes.WITHER)) return false;
-        if (damagesource.is(DamageTypes.DROWN)) return false;
-        if (damagesource.is(DamageTypes.WITHER_SKULL)) return false;
-        if (damagesource.is(DamageTypes.DRAGON_BREATH)) return false;
-        if (damagesource.is(DamageTypes.ON_FIRE)) return false;
-        if (damagesource.is(DamageTypes.IN_FIRE)) return false;
-        if (damagesource.getDirectEntity() instanceof AbstractArrow) return false;
-        return super.hurt(damagesource, f);
-    }
-
-    public void die(DamageSource damagesource) {
-        super.die(damagesource);
-        if (this.level() instanceof ServerLevel serverLevel) {
-            if (this.nullSwordEntity != null) {
-                this.nullSwordEntity.remove(RemovalReason.KILLED);
-            }
-            if (this.nullAxeEntity != null) {
-                this.nullAxeEntity.remove(RemovalReason.KILLED);
-            }
-            if (this.nullHoeEntity != null) {
-                this.nullHoeEntity.remove(RemovalReason.KILLED);
-            }
-            if (this.nullShovelEntity != null) {
-                this.nullShovelEntity.remove(RemovalReason.KILLED);
-            }
-            if (this.nullPickaxeEntity != null) {
-                this.nullPickaxeEntity.remove(RemovalReason.KILLED);
-            }
-
-            this.setInvisible(true);
-            this.remove(RemovalReason.KILLED);
-        }
-    }
-
     public void baseTick() {
         super.baseTick();
-        if(BuxinMod.isWindows() && VFXParticleConfig.VFXParticleConfig.get() && Math.random() > 0.8848){
-            VFXTool.addVFXParticle(new Vec3(this.getX(),this.getY() + 1,this.getZ()),BuxinMod.MODID,"null",this.level());
+
+        if (BuxinMod.isWindows() && VFXParticleConfig.VFXParticleConfig.get() && Math.random() > 0.8848) {
+            VFXTool.addVFXParticle(new Vec3(getX(), getY() + 1, getZ()), BuxinMod.MODID, "null", level());
         }
 
-        if (Math.random() <= 0.1D) {
-            RandomSource randomSource = this.level().getRandom();
-            if (this.nullSwordEntity != null) {
-                this.nullSwordEntity.moveTo(this.getX() + (double) Mth.nextInt(randomSource, -4, 4), 
-                                            this.getY() + (double) Mth.nextInt(randomSource, -2, 2), 
-                                            this.getZ() + (double) Mth.nextInt(randomSource, -4, 4));
-            }
-            if (this.nullAxeEntity != null) {
-                this.nullAxeEntity.moveTo(this.getX() + (double) Mth.nextInt(randomSource, -4, 4), 
-                                          this.getY() + (double) Mth.nextInt(randomSource, -2, 2), 
-                                          this.getZ() + (double) Mth.nextInt(randomSource, -4, 4));
-            }
-            if (this.nullPickaxeEntity != null) {
-                this.nullPickaxeEntity.moveTo(this.getX() + (double) Mth.nextInt(randomSource, -4, 4), 
-                                              this.getY() + (double) Mth.nextInt(randomSource, -2, 2), 
-                                              this.getZ() + (double) Mth.nextInt(randomSource, -4, 4));
-            }
-            if (this.nullShovelEntity != null) {
-                this.nullShovelEntity.moveTo(this.getX() + (double) Mth.nextInt(randomSource, -4, 4), 
-                                             this.getY() + (double) Mth.nextInt(randomSource, -2, 2), 
-                                             this.getZ() + (double) Mth.nextInt(randomSource, -4, 4));
-            }
-            if (this.nullHoeEntity != null) {
-                this.nullHoeEntity.moveTo(this.getX() + (double) Mth.nextInt(randomSource, -4, 4), 
-                                          this.getY() + (double) Mth.nextInt(randomSource, -2, 2), 
-                                          this.getZ() + (double) Mth.nextInt(randomSource, -4, 4));
-            }
+        if (Math.random() <= 0.1) {
+            RandomSource rs = level().getRandom();
+            teleportTool(nullSwordEntity,   rs);
+            teleportTool(nullAxeEntity,     rs);
+            teleportTool(nullPickaxeEntity, rs);
+            teleportTool(nullShovelEntity,  rs);
+            teleportTool(nullHoeEntity,     rs);
         }
 
-        if (this.getTarget() != null) {
-            this.setDeltaMovement(new Vec3(this.getLookAngle().x * 0.2D, this.getLookAngle().y * 0.2D, this.getLookAngle().z * 0.2D));
+        LivingEntity target = getTarget();
+        if (target != null) {
+            Vec3 dir = target.position().subtract(position()).normalize().scale(0.2);
+            setDeltaMovement(getDeltaMovement().add(dir));
         }
     }
 
-    protected void checkFallDamage(double d0, boolean flag, BlockState blockstate, BlockPos blockpos) {}
-
-    public void setNoGravity(boolean flag) {
-        super.setNoGravity(true);
+    private void teleportTool(NullWeaponEntity tool, RandomSource rs) {
+        if (tool != null) {
+            tool.moveTo(
+                getX() + Mth.nextInt(rs, -4, 4),
+                getY() + Mth.nextInt(rs, -2, 2),
+                getZ() + Mth.nextInt(rs, -4, 4)
+            );
+        }
     }
 
-    public void aiStep() {
-        super.aiStep();
-        this.setNoGravity(true);
+    // ==================== AI ====================
+    @Override
+    protected void registerGoals() {
+        goalSelector.addGoal(1, new MeleeAttackGoal(this, 1.2, false) {
+            @Override
+            protected double getAttackReachSqr(LivingEntity entity) {
+                return mob.getBbWidth() * mob.getBbWidth() + entity.getBbWidth();
+            }
+        });
+        goalSelector.addGoal(2, new RandomStrollGoal(this, 1));
+        goalSelector.addGoal(4, new RandomLookAroundGoal(this));
+        goalSelector.addGoal(5, new FloatGoal(this));
+
+        targetSelector.addGoal(3, new HurtByTargetGoal(this));
+        addTarget(6, GreenVillagerCavalryEntity.class);
+        addTarget(7, Grave2Entity.class);
+        addTarget(8, Player.class);
+        addTarget(9, PurpleVillagerCavalryEntity.class);
+        addTarget(10, RedVillagerEntity.class);
+        addTarget(11, CunMinWeiBingEntity.class);
+        addTarget(12, Jshaman2Entity.class);
+        addTarget(13, ShifangEntity.class);
+        addTarget(14, LanemobentiEntity.class);
+
+        AddCommonAttackGoal.Herobrine(this);
+
+        goalSelector.addGoal(24, new FlyToTargetGoal());
+    }
+
+    private void addTarget(int priority, Class<? extends LivingEntity> clazz) {
+        targetSelector.addGoal(priority, new NearestAttackableTargetGoal<>(this, clazz, true, false));
+    }
+
+    private class FlyToTargetGoal extends Goal {
+        FlyToTargetGoal() { setFlags(EnumSet.of(Flag.MOVE)); }
+
+        @Override public boolean canUse() { return getTarget() != null && !getMoveControl().hasWanted(); }
+
+        @Override public boolean canContinueToUse() {
+            LivingEntity t = getTarget();
+            return t != null && t.isAlive() && getMoveControl().hasWanted();
+        }
+
+        @Override public void start() {
+            LivingEntity t = getTarget();
+            if (t != null) moveControl.setWantedPosition(t.getX(), t.getEyeY(), t.getZ(), 1.0);
+        }
+
+        @Override public void tick() {
+            LivingEntity t = getTarget();
+            if (t == null) return;
+            if (getBoundingBox().intersects(t.getBoundingBox())) {
+                doHurtTarget(t);
+            } else if (distanceToSqr(t) < 16) {
+                moveControl.setWantedPosition(t.getX(), t.getEyeY(), t.getZ(), 5.0);
+            }
+        }
+    }
+
+    // ==================== 伤害 ====================
+    @Override
+    public boolean hurt(DamageSource src, float amount) {
+        NullDangShiTiShouShangShiProcedure.execute(level(), getX(), getY(), getZ(), this, src.getEntity());
+        if (src.is(DamageTypes.CACTUS) || src.is(DamageTypes.WITHER) || src.is(DamageTypes.DROWN)
+            || src.is(DamageTypes.WITHER_SKULL) || src.is(DamageTypes.DRAGON_BREATH)
+            || src.is(DamageTypes.ON_FIRE) || src.is(DamageTypes.IN_FIRE)
+            || src.getDirectEntity() instanceof AbstractArrow) return false;
+        return super.hurt(src, amount);
     }
 
     @Override
-    public void remove(RemovalReason pReason) {
-        if (this.level() instanceof ServerLevel serverLevel && pReason.equals(RemovalReason.DISCARDED)) {
-            if (this.nullSwordEntity != null) {
-                this.nullSwordEntity.remove(RemovalReason.DISCARDED);
-            }
-            if (this.nullAxeEntity != null) {
-                this.nullAxeEntity.remove(RemovalReason.DISCARDED);
-            }
-            if (this.nullHoeEntity != null) {
-                this.nullHoeEntity.remove(RemovalReason.DISCARDED);
-            }
-            if (this.nullShovelEntity != null) {
-                this.nullShovelEntity.remove(RemovalReason.DISCARDED);
-            }
-            if (this.nullPickaxeEntity != null) {
-                this.nullPickaxeEntity.remove(RemovalReason.DISCARDED);
-            }
+    public void die(DamageSource src) {
+        super.die(src);
+        if (level() instanceof ServerLevel) {
+            discardTool(nullSwordEntity);
+            discardTool(nullAxeEntity);
+            discardTool(nullHoeEntity);
+            discardTool(nullShovelEntity);
+            discardTool(nullPickaxeEntity);
+            setInvisible(true);
+            remove(RemovalReason.KILLED);
         }
-        super.remove(pReason);
     }
 
-    public static void init() {
-        DungeonHooks.addDungeonMob(BuxinModEntities.NULL.get(), 180);
+    @Override
+    public void remove(RemovalReason reason) {
+        if (level() instanceof ServerLevel && reason == RemovalReason.DISCARDED) {
+            discardTool(nullSwordEntity);
+            discardTool(nullAxeEntity);
+            discardTool(nullHoeEntity);
+            discardTool(nullShovelEntity);
+            discardTool(nullPickaxeEntity);
+        }
+        super.remove(reason);
     }
+
+    private void discardTool(Entity tool) {
+        if (tool != null) tool.remove(RemovalReason.DISCARDED);
+    }
+
+    // ==================== 杂物 ====================
+    @Override public MobType getMobType() { return MobType.UNDEAD; }
+    @Override public boolean removeWhenFarAway(double d) { return false; }
+    @Override public double getMyRidingOffset() { return -0.35; }
+    @Override public boolean causeFallDamage(float f1, float f2, DamageSource src) { return false; }
+    @Override public void checkFallDamage(double d, boolean b, BlockState state, BlockPos pos) {}
+    @Override public void aiStep() { super.aiStep(); setNoGravity(true); }
+
+    @Override public SoundEvent getHurtSound(DamageSource src) { return ForgeRegistries.SOUND_EVENTS.getValue(new ResourceLocation("entity.generic.hurt")); }
+    @Override public SoundEvent getDeathSound() { return ForgeRegistries.SOUND_EVENTS.getValue(new ResourceLocation("entity.generic.death")); }
+
+    public static void init() { DungeonHooks.addDungeonMob(BuxinModEntities.NULL.get(), 180); }
 
     public static Builder createAttributes() {
-        Builder builder = Mob.createMobAttributes();
-
-        builder = builder.add(Attributes.MOVEMENT_SPEED, 3.0D);
-        builder = builder.add(Attributes.MAX_HEALTH, 275.0D);
-        builder = builder.add(Attributes.ARMOR, 90.0D);
-        builder = builder.add(Attributes.ATTACK_DAMAGE, 8.0D);
-        builder = builder.add(Attributes.FOLLOW_RANGE, 128.0D);
-        builder = builder.add(Attributes.FLYING_SPEED, 3.0D);
-        return builder;
+        return Mob.createMobAttributes()
+                .add(Attributes.MOVEMENT_SPEED, 3)
+                .add(Attributes.MAX_HEALTH, 275)
+                .add(Attributes.ARMOR, 90)
+                .add(Attributes.ATTACK_DAMAGE, 8)
+                .add(Attributes.FOLLOW_RANGE, 128)
+                .add(Attributes.FLYING_SPEED, 3);
     }
 }
